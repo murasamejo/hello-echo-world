@@ -12,19 +12,20 @@ import (
 )
 
 // TODO: string or *string
+// TODO: sql: Scan error on column index 9, name "created_at": unsupported Scan, storing driver.Value type string into type *time.Time
 // gorm.Model を宣言すると deleted_at が自動で注入される（されてしまう）
 type FakeMaterial struct {
 	ID                      uint `gorm:"primaryKey"`
 	Name                    string
 	Email                   string
 	Credit_card_number      string
-	Credit_card_expiry_date time.Time
+	Credit_card_expiry_date *time.Time
 	Credit_card_type        string
 	City                    string
 	Gender                  string
 	MyNumber                uint
-	Created_at              time.Time
-	Updated_at              time.Time
+	Created_at              *time.Time
+	Updated_at              *time.Time
 }
 
 func main() {
@@ -32,6 +33,7 @@ func main() {
 	if err != nil {
 		panic("failed to connect database")
 	}
+	db.Debug()
 	var fake_material FakeMaterial
 
 	db.First(&fake_material)
@@ -56,5 +58,7 @@ func getUser(c echo.Context) error {
 
 	id := c.Param("id")
 	db.First(&fake_material, id)
+
+	// TODO: JSONで返す
 	return c.String(http.StatusOK, fake_material.Email)
 }
